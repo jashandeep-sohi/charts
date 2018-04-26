@@ -20,6 +20,10 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+    {{- with .Values.worker.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       serviceAccountName: {{ if .Values.rbac.create }}{{ template "concourse.worker.fullname" . }}{{ else }}{{ .Values.rbac.workerServiceAccountName }}{{ end }}
       tolerations:
 {{ toYaml .Values.worker.tolerations | indent 8 }}
@@ -73,9 +77,13 @@ spec:
                     done
           env:
             - name: CONCOURSE_TSA_HOST
+          {{- if semverCompare "^3.10.x" .Values.imageTag }}
+              value: "{{ template "concourse.web.fullname" . }}:{{ .Values.concourse.tsaPort}}"
+          {{- else }}
               value: {{ template "concourse.web.fullname" . }}
             - name: CONCOURSE_TSA_PORT
               value: {{ .Values.concourse.tsaPort | quote }}
+          {{- end }}
             - name: CONCOURSE_GARDEN_DOCKER_REGISTRY
               value: {{ .Values.concourse.dockerRegistry | quote }}
             - name: CONCOURSE_GARDEN_INSECURE_DOCKER_REGISTRY
@@ -149,7 +157,7 @@ spec:
         - name: concourse-work-dir
           emptyDir: {}
   {{- end }}
-{{- if and (eq .Capabilities.KubeVersion.Major "1") (ge .Capabilities.KubeVersion.Minor "7") }}
+{{- if semverCompare "^1.7-0" .Capabilities.KubeVersion.GitVersion }}
   updateStrategy:
     type: {{ .Values.worker.updateStrategy }}
 {{- end }}

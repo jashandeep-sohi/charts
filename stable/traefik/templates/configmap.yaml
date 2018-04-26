@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "traefik.fullname" . }}
   labels:
-    app: {{ template "fullname" . }}
+    app: {{ template "traefik.name" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
     release: "{{ .Release.Name }}"
     heritage: "{{ .Release.Service }}"
@@ -17,6 +17,9 @@ data:
     {{- if .Values.sendAnonymousUsage }}
     sendAnonymousUsage = true
     {{- end }}
+    {{- if .Values.ssl.insecureSkipVerify }}
+    InsecureSkipVerify = true
+    {{- end }}
     {{- if .Values.ssl.enabled }}
     defaultEntryPoints = ["http","https"]
     {{- else }}
@@ -25,9 +28,12 @@ data:
     [entryPoints]
       [entryPoints.http]
       address = ":80"
+      {{- if .Values.whiteListSourceRange }}
+      {{ template "traefik.whiteListSourceRange" . }}
+      {{- end }}
       {{- if .Values.proxyProtocol.enabled }}
         [entryPoints.http.proxyProtocol]
-        {{ template "trustedips" . }}
+        {{ template "traefik.trustedips" . }}
       {{- end }}
       compress = {{ .Values.gzip.enabled }}
         {{- if .Values.ssl.enforced }}
@@ -37,10 +43,13 @@ data:
         {{- end }}
       {{- if .Values.ssl.enabled }}
       [entryPoints.https]
+      {{- if .Values.whiteListSourceRange }}
+      {{ template "traefik.whiteListSourceRange" . }}
+      {{- end }}
       address = ":443"
       {{- if .Values.proxyProtocol.enabled }}
         [entryPoints.https.proxyProtocol]
-        {{ template "trustedips" . }}
+        {{ template "traefik.trustedips" . }}
       {{- end }}
       compress = {{ .Values.gzip.enabled }}
         [entryPoints.https.tls]
@@ -49,6 +58,9 @@ data:
           KeyFile = "/ssl/tls.key"
       {{- else }}
       [entryPoints.httpn]
+      {{- if .Values.whiteListSourceRange }}
+      {{ template "traefik.whiteListSourceRange" . }}
+      {{- end }}
       address = ":8880"
       compress = {{ .Values.gzip.enabled }}
       {{- end }}
