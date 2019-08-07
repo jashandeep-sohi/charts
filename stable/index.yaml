@@ -21,4 +21,24 @@ entries:
     urls:
     - git-repo+chart://ab6ab7b582584643f907a36d93c6c7a79070bf5a/stable/prometheus/prometheus-6.2.1.tgz
     version: 6.2.1
-generated: "2019-08-06T17:00:30.417328277-07:00"
+  rethinkdb:
+  - appVersion: 0.1.0
+    created: "2019-08-06T19:41:22.864230781-07:00"
+    description: The open-source database for the realtime web
+    digest: afbec8ff727b0ef82d7d21bad4654b6c00bbeefea79456a28fa5dfb8c21400c8
+    home: https://www.rethinkdb.com
+    icon: http://i.imgur.com/bZ75N6r.jpg
+    keywords:
+    - rethinkdb
+    - database
+    - nosql
+    maintainers:
+    - email: cody.lundquist@gmail.com
+      name: meenie
+    name: rethinkdb
+    sources:
+    - https://hub.docker.com/r/codylundquist/helm-rethinkdb-cluster/
+    urls:
+    - git-repo+chart://51fc3b2e18f8635eb861551456e4658e2b97e6be/stable/rethinkdb/rethinkdb-0.1.3.tgz
+    version: 0.1.3
+generated: "2019-08-06T19:41:22.863381894-07:00"
